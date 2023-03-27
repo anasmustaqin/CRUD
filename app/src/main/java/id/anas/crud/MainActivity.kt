@@ -46,6 +46,40 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         when (v.getId()) {
             R.id.save -> {
                 // Statement program untuk simpan data
+                //Mendapatkan UserID dari pengguna yang Terautentikasi
+                val getUserID = auth!!.currentUser!!.uid
+
+                //Mendapatkan Instance dari Database
+                val database = FirebaseDatabase.getInstance()
+
+                //Menyimpan Data yang diinputkan User kedalam Variable
+                val getNIM: String = nim.getText().toString()
+                val getNama: String = nama.getText().toString()
+                val getJurusan: String = jurusan.getText().toString()
+
+                // Mendapatkan Referensi dari Database
+                val getReference: DatabaseReference
+                getReference = database.reference
+
+                // Mengecek apakah ada data yang kosong
+                if (isEmpty(getNIM) || isEmpty(getNama) || isEmpty(getJurusan)) {
+                    //Jika Ada, maka akan menampilkan pesan singkan seperti berikut ini.
+                    Toast.makeText(this@MainActivity, "Data tidak boleh ada yang kosong", Toast.LENGTH_SHORT).show()
+                } else {
+                    /* Jika Tidak, maka data dapat diproses dan meyimpannya pada Database        Menyimpan data referensi pada Database berdasarkan User ID dari masing-masing Akun
+                    */
+                    getReference.child("Admin").child(getUserID).child("Mahasiswa").push()
+                        .setValue(data_mahasiswa(getNIM, getNama, getJurusan))
+                        .addOnCompleteListener(this) { //Peristiwa ini terjadi saat user berhasil menyimpan datanya kedalam Database
+                            nim.setText("")
+                            nama.setText("")
+                            jurusan.setText("")
+                            Toast.makeText(this@MainActivity, "Data Tersimpan", Toast.LENGTH_SHORT).show()
+                        }
+                }
+            }
+
+        }
             }
             R.id.logout ->
                 // Statement program untuk logout/keluar
