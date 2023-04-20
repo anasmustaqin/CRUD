@@ -72,6 +72,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                             Toast.makeText(this@MainActivity, "Data Tersimpan", Toast.LENGTH_SHORT).show()
                         }
                 }
+<<<<<<< HEAD
+=======
+            }
+
+        }
+>>>>>>> 20f2212295b3764659d6eed97bf4d1aa2fbef69b
             }
 
         }
