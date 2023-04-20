@@ -1,25 +1,18 @@
 package id.anas.crud
+
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import id.anas.crud.R.id.showdata
-import id.anas.crud.databinding.ActivityMainBinding
+import id.anas.crud.R.layout.activity_main
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
@@ -28,7 +21,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val RC_SIGN_IN = 1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(activity_main)
 
         //Inisialisasi ID (Button)
         logout.setOnClickListener(this)

@@ -1,40 +1,96 @@
 package id.anas.crud
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
+import android.text.TextUtils
+import android.text.TextUtils.isEmpty
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import id.anas.crud.databinding.ActivityUpdateData2Binding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import kotlinx.android.synthetic.main.activity_update_data.*
 
 class UpdateData : AppCompatActivity() {
-
-    private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var binding: ActivityUpdateData2Binding
-
+    //Deklarasi Variable
+    private var database: DatabaseReference? = null
+    private var auth: FirebaseAuth? = null
+    private var cekNIM: String? = null
+    private var cekNama: String? = null
+    private var cekJurusan: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_update_data)
+        supportActionBar!!.title = "Update Data"
+//Mendapatkan Instance autentikasi dan Referensi dari Database
+        auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance().reference
+        data //memanggil method "data"
+        update.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+//Mendapatkan Data Mahasiswa yang akan dicek
+                cekNIM = new_nim.getText().toString()
+                cekNama = new_nama.getText().toString()
+                cekJurusan = new_jurusan.getText().toString()
 
-        binding = ActivityUpdateData2Binding.inflate(layoutInflater)
-        setContentView(binding.root)
+//Mengecek agar tidak ada data yang kosong, saat proses update
+                if (isEmpty(cekNIM!!) || isEmpty(cekNama!!) ||
+                    isEmpty(cekJurusan!!)
+                ) {
+                    Toast.makeText(
+                        this@UpdateData,
 
-        setSupportActionBar(binding.toolbar)
+                        "Data tidak boleh ada yang kosong",
+                        Toast.LENGTH_SHORT
 
-        val navController = findNavController(R.id.nav_host_fragment_content_update_data)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
+                    ).show()
+                } else {
+/*Menjalankan proses update data.
+Method Setter digunakan untuk mendapakan data baru yang diinputkan User.*/
+                    val setMahasiswa = data_mahasiswa()
 
-        binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
+                    setMahasiswa.nim = new_nim.getText().toString()
+                    setMahasiswa.nama = new_nama.getText().toString()
+                    setMahasiswa.jurusan = new_jurusan.getText().toString()
+                    updateMahasiswa(setMahasiswa)
+                }
+            }
+        })
+    }
+    // Mengecek apakah ada data yang kosong, sebelum diupdate
+    private fun isEmpty(s: String): Boolean {
+        return TextUtils.isEmpty(s)
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_update_data)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
+    //Menampilkan data yang akan di update
+    private val data: Unit
+        get() {
+//Menampilkan data dari item yang dipilih sebelumnya
+            val getNIM = intent.extras!!.getString("dataNIM")
+            val getNama = intent.extras!!.getString("dataNama")
+            val getJurusan = intent.extras!!.getString("dataJurusan")
+            new_nim!!.setText(getNIM)
+            new_nama!!.setText(getNama)
+            new_jurusan!!.setText(getJurusan)
+        }
+    //Proses Update data yang sudah ditentukan
+    private fun updateMahasiswa(mahasiswa: data_mahasiswa) {
+        val userID = auth!!.uid
+        val getKey = intent.extras!!.getString("getPrimaryKey")
+        database!!.child("Admin")
+            .child(userID!!)
+            .child("Mahasiswa")
+            .child(getKey!!)
+            .setValue(mahasiswa)
+            .addOnSuccessListener {
+                new_nim!!.setText("")
+                new_nama!!.setText("")
+                new_jurusan!!.setText("")
+                Toast.makeText(
+                    this@UpdateData, "Data Berhasil diubah",
+                    Toast.LENGTH_SHORT
+                ).show()
+                finish()
+            }
     }
 }
